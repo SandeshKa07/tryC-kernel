@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 
 	printf("Address of ptr1 is %p\n", ptr1);
 	printf("Address of ptr2 is %p\n", ptr2);
+	printf("Address of ptr3 is %p\n", ptr3);
+
 
 	printf("Data in ptr1=%p is %c\n", ptr1, *ptr1);
 	printf("Data in ptr2=%p is %c\n", ptr2, *ptr2);
@@ -28,5 +30,10 @@ int main(int argc, char *argv[])
 
 	printf("Data in ptr1=%p is %c\n", ptr1, *ptr1);
 	printf("Data in ptr2=%p is %c\n", ptr2, *ptr2);	
+
+	free(ptr3);
+	free(ptr2);
+	free(ptr1);
+
 	return 0;
 }
