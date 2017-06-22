@@ -10,7 +10,7 @@
 struct proc_dir_entry *proc;
 static const struct file_operations proc_fops;
 
-int len=0,temp=0;
+int len=0;
 char *msg;
 char *proc_node_name = "hello";
 
@@ -18,21 +18,16 @@ static ssize_t example_read_proc(struct file *filp,char *buf,size_t count,loff_t
 {
 	char *data;
 	int rv = 0;
-	data=PDE_DATA(file_inode(filp));
+
+	data = PDE_DATA(file_inode(filp));
 	if(!(data)) {
 		printk(KERN_INFO "Null data");
 		return 0;
 	}
-
-	if(count>temp) {
-		count=temp;
-	}
-	temp=temp-count;
-
+	if(count > len)
+		count = len;
+	len = len - count;
 	rv = copy_to_user(buf,data, count);
-
-	if(count==0)
-		temp=len;
 
 	return count;
 }
@@ -43,9 +38,12 @@ static const struct file_operations proc_fops = {
 
 static void create_proc_entry(void) {
 	msg="Hello World\n";
+	/* Read is the file operation performed on the proc entry "hello"
+	 * proc fops is the structure defining the file operations
+	 * proc_create_data initalises and assigns all the value for pde, proc_dir_entry.
+         */
 	proc=proc_create_data(proc_node_name,0,NULL,&proc_fops,msg);
 	len=strlen(msg);
-	temp=len;
 }
 
 static int __init proc_init (void) {
