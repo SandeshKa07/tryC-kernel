@@ -9,7 +9,7 @@
 
 static struct usb_device_id eudy_usb_id_table [] = {
 	/*vendorID=0x413c for DELL, productID=0x2003 for DELL keyboard */
-	{USB_DEVICE(0x413c, 0x2003)},
+	{USB_DEVICE(0x1a2c, 0x0002)},
 
 	/* Interfaceclass = 3, Boot interface subclass = 1, Keyboard = 1 */
 	{USB_INTERFACE_INFO(3,1,1)},
@@ -22,14 +22,19 @@ MODULE_DEVICE_TABLE (usb, eudy_usb_id_table);
 static int eudy_usb_driver_probe (struct usb_interface *intf,
 				  const struct usb_device_id *id) {
 
-	pr_debug("USB keyboard plugged in and driver got probed");
+	printk("Hello world Module: USB driver is probed");
 	return 0;
+}
+
+static void eudy_usb_driver_disconnect(struct usb_interface *intf) {
+        printk("Hello world Module: USB keyboard detached\n");
 }
 
 static struct usb_driver my_usb_driver = {
 	.name           = "eudy usb driver",
 	.id_table       = eudy_usb_id_table,
 	.probe          = eudy_usb_driver_probe,
+	.disconnect     = eudy_usb_driver_disconnect,
 };
 
 static int __init usb_driver_init(void) {
@@ -40,13 +45,13 @@ static int __init usb_driver_init(void) {
 	if(result)
 		pr_debug("usb_register failed. Error number %d\n", result);
 
-	pr_debug("\nHello World, usb keyboard is plugged\n");
+	printk("\nHello World Module: USB keyboard is plugged\n");
 	return result;
 }
 
 static void __exit usb_driver_exit(void) {
 	usb_deregister(&my_usb_driver);
-	pr_debug("\nGood Bye usb device is removed and i am siging off\n");
+	printk("\nHello World Module: Good bye !\n");
 }
 
 module_init(usb_driver_init);
