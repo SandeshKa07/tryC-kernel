@@ -5,44 +5,39 @@
 #include <linux/fs.h>
 #include <linux/printk.h>
 
-static const char assignID[] = "a89cef62eae7\n";
-static const ssize_t size_assignID = sizeof(assignID);
+#define myassignID "a89cef62eae7"
+#define idLen 13
 
 static ssize_t my_misc_read(struct file *file, char __user *buffer, size_t count, loff_t *ppos)
 {
-	pr_info("misc-driver: Device file read at offset=%i, read bytes  =%u\n",
-		(int)*ppos, (unsigned int)count);
-
-	if( *ppos >= size_assignID )
+	if (*ppos != 0)
 		return 0;
-
-	if( *ppos + count > size_assignID )
-		count = size_assignID - *ppos;
 	
-	if(copy_to_user(buffer, assignID + *ppos, count) != 0)
+	if ((count < idLen) || copy_to_user(buffer, myassignID, idLen))
 		return -EFAULT;
 
-	*ppos +=count;
+	*ppos += count;
 	return count;
 }
 
 static ssize_t my_misc_write(struct file *file, const char __user *buffer, size_t count, loff_t *ppos)
 {
-	char writebuffer[size_assignID];
-	pr_info("\nwritebuffer value is %s\n", writebuffer);
-
-	if(copy_from_user(writebuffer, assignID, count) != 0)
+	char wbuffer[idLen];
+	
+	if(count != idLen)
+		return -EINVAL;
+	   
+	if(copy_from_user(wbuffer, buffer, count))
 		return -EFAULT;
 
-	pr_info("\nwritebuffer value is %s\n", writebuffer);
-	
-	if (strncmp(writebuffer,assignID, size_assignID) != 0)
+	if(strncmp(myassignID, wbuffer, (idLen - 1)))
 		return -EINVAL;
 
-	return 0;
+	return count;
 }
 
 const static struct file_operations my_misc_fops = {
+	.owner = THIS_MODULE,
 	.read = my_misc_read,
 	.write = my_misc_write,
 };
@@ -56,6 +51,7 @@ static struct miscdevice my_misc_device = {
 static int __init my_misc_init(void)
 {
 	int error;
+	pr_info("\nHello World\n");
 	error = misc_register(&my_misc_device);
 	if(error)
 	{
