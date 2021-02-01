@@ -5,10 +5,10 @@ static void my_function(int a){
 }
 
 int main(){
-	void (*my_func_ptr)(int) = &my_function; //assigning function to a function pointer
+	void (*my_func_ptr)(int) = my_function; //assigning function to a function pointer
 
 	/* Calling the function with an argument*/
-	(*my_func_ptr)(10);
+	(my_func_ptr)(10);
 
 	return 0;
 }
